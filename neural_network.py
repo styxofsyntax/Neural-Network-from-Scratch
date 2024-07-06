@@ -77,15 +77,27 @@ class NeuralNetwork:
             # Propagate the error to the previous layer
             dE_a = np.dot(dE_z, dz_a_prev.T)
 
-    def fit(self, inputs, outputs, epoch, alpha):
+    def fit(self, inputs, outputs, epoch, alpha, batch_size):
         for i in range(epoch):
-            self.forward_prop(inputs)
+            batches = len(inputs) // batch_size
+
+            for j in range(batches):
+                start_index = j * batch_size
+                batch_input = inputs[start_index: start_index + batch_size]
+                batch_output = outputs[start_index: start_index + batch_size]
+
+                self.forward_prop(batch_input)
+                self.backward_prop(batch_input, batch_output, alpha)
 
             if i % (epoch // 10) == 0:
-                loss = self.calculate_loss(self.layers[-1].output, outputs)
-                print(f'loss: {loss}')
+                pred = self.forward_prop(inputs)
+                loss = self.calculate_loss(pred, outputs)
 
-            self.backward_prop(inputs, outputs, alpha)
+                pred_categorical = np.argmax(pred, axis=1)
+                outputs_categorical = np.argmax(outputs, axis=1)
+
+                accuracy = np.mean(pred_categorical == outputs_categorical)
+                print(f'loss: {loss} - accuracy: {accuracy}')
 
     def calculate_loss(self, outputs, targets):
         return np.mean(np.square(outputs - targets))
