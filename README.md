@@ -39,7 +39,7 @@ python mnist_train.py
 
 ## Documentation
 
-- [Mathematical Details](docs/mathematics.md)
+- [Mathematical Details](docs/mathematics.pdf)
 
 ## Resources
 
